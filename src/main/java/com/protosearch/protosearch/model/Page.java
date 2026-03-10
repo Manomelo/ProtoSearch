@@ -1,9 +1,9 @@
 package com.protosearch.protosearch.model;
 
 
+import com.protosearch.protosearch.enums.CrawlStatus;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
