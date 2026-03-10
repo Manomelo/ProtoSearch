@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class searchResponse {
+public class SearchResponse {
     private String query;
     private long totalResults;
     private int page;
