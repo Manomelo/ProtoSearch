@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * Representa uma página web armazenada no sistema, contendo informações como URL, conteúdo, status HTTP e metadados.
  */
