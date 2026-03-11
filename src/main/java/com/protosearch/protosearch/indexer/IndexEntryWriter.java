@@ -26,14 +26,16 @@ public class IndexEntryWriter implements ItemWriter<List<IndexEntry>> {
         for (List<IndexEntry> entries : chunk){
             if(entries.isEmpty()) continue;
 
+            Long pageId = entries.get(0).getPage().getId();
+            Page managedPage = pageRepository.getReferenceById(pageId);
+
+            entries.forEach(e -> e.setPage(managedPage));
             indexEntryRepository.saveAll(entries);
 
-            Page page = entries.get(0).getPage();
+            managedPage.setStatus(CrawlStatus.INDEXED);
+            pageRepository.save(managedPage);
 
-            page.setStatus(CrawlStatus.INDEXED);
-            pageRepository.save(page);
-
-            log.info("Indexed page: {} ({} terms)", page.getUrl(), entries.size());
+            log.info("Indexed page: {} ({} terms)", managedPage.getUrl(), entries.size());
         }
     }
 }
