@@ -32,10 +32,9 @@ public class AdminController {
 
 
     @PostMapping("/crawl")
-    public ResponseEntity<String> startCrawl(){
-
+    public ResponseEntity<String> startCrawl() {
         crawlerService.startCrawl(crawlerProprieties.getSeedUrls());
-        return ResponseEntity.ok("Crawl Started");
+        return ResponseEntity.ok("Crawl started in background.");
     }
 
 

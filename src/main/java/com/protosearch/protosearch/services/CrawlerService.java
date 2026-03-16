@@ -10,6 +10,7 @@ import com.protosearch.protosearch.repositories.PageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ public class CrawlerService {
     @Value("${crawler.max-pages:50}")
     private int maxPages;
 
+    @Async("crawlerExecutor")
     public void startCrawl(List<String> seedUrls){
         seedUrls.forEach(frontier::enqueue);
         crawl();
