@@ -13,6 +13,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
-@RequiredArgsConstructor
 @Slf4j
 public class AdminController {
 
@@ -34,6 +34,22 @@ public class AdminController {
     private final PageRepository pageRepository;
     private final CrawlerFrontier crawlerFrontier;
 
+    public AdminController(
+            @Qualifier("asyncJobLauncher") JobLauncher jobLauncher,
+            Job indexJob,
+            CrawlerService crawlerService,
+            CrawlerProprieties crawlerProprieties,
+            IndexEntryRepository indexEntryRepository,
+            PageRepository pageRepository,
+            CrawlerFrontier crawlerFrontier) {
+        this.jobLauncher = jobLauncher;
+        this.indexJob = indexJob;
+        this.crawlerService = crawlerService;
+        this.crawlerProprieties = crawlerProprieties;
+        this.indexEntryRepository = indexEntryRepository;
+        this.pageRepository = pageRepository;
+        this.crawlerFrontier = crawlerFrontier;
+    }
 
     @PostMapping("/crawl")
     public ResponseEntity<String> startCrawl() {
