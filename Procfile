@@ -1,1 +1,1 @@
-web: java -jar target/searchEngine-0.0.1-SNAPSHOT.jar
+web: java -jar target/protosearch-0.0.1-SNAPSHOT.jar
