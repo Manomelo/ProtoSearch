@@ -31,6 +31,9 @@ function SearchBar({ query, setQuery, onSearch }) {
             if (selectedIndex >= -1){
                 setSelectedIndex(selectedIndex - 1)
             }
+        } else if (e.key === "Escape"){
+            setSuggestions([])
+            setSelectedIndex(-1)
         }
     }
 
