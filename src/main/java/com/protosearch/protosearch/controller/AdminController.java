@@ -3,10 +3,7 @@ package com.protosearch.protosearch.controller;
 
 import com.protosearch.protosearch.crawler.CrawlerFrontier;
 import com.protosearch.protosearch.crawler.CrawlerProprieties;
-import com.protosearch.protosearch.repositories.IndexEntryRepository;
-import com.protosearch.protosearch.repositories.PageRepository;
 import com.protosearch.protosearch.services.CrawlerService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -31,8 +28,6 @@ public class AdminController {
     private final Job indexJob;
     private final CrawlerService crawlerService;
     private final CrawlerProprieties crawlerProprieties;
-    private final IndexEntryRepository indexEntryRepository;
-    private final PageRepository pageRepository;
     private final CrawlerFrontier crawlerFrontier;
     private final JdbcTemplate jdbcTemplate;
 
@@ -41,17 +36,14 @@ public class AdminController {
             Job indexJob,
             CrawlerService crawlerService,
             CrawlerProprieties crawlerProprieties,
-            IndexEntryRepository indexEntryRepository,
-            PageRepository pageRepository,
-            CrawlerFrontier crawlerFrontier, JdbcTemplate jdbcTemplate) {
+            JdbcTemplate jdbcTemplate,
+            CrawlerFrontier crawlerFrontier) {
         this.jobLauncher = jobLauncher;
         this.indexJob = indexJob;
         this.crawlerService = crawlerService;
         this.crawlerProprieties = crawlerProprieties;
-        this.indexEntryRepository = indexEntryRepository;
-        this.pageRepository = pageRepository;
-        this.crawlerFrontier = crawlerFrontier;
         this.jdbcTemplate = jdbcTemplate;
+        this.crawlerFrontier = crawlerFrontier;
     }
 
     @PostMapping("/crawl")
@@ -94,21 +86,22 @@ public class AdminController {
             return ResponseEntity.internalServerError().body("Erro: " + e.getMessage());
         }
     }
-}
+    @PostMapping("/index")
+    public ResponseEntity<String> triggerIndexing() {
+        JobParameters params = new JobParametersBuilder()
+                .addLong("started at: ", System.currentTimeMillis())
+                .toJobParameters();
 
-@PostMapping("/index")
-public ResponseEntity<String> triggerIndexing() {
-    JobParameters params = new JobParametersBuilder()
-            .addLong("started at: ", System.currentTimeMillis())
-            .toJobParameters();
+        try {
+            jobLauncher.run(indexJob, params);
 
-    try {
-        jobLauncher.run(indexJob, params);
-
-        return ResponseEntity.ok("Indexing Job Started");
-    } catch (JobExecutionAlreadyRunningException | JobParametersInvalidException | JobRestartException |
-             JobInstanceAlreadyCompleteException e) {
-        return ResponseEntity.internalServerError().build();
+            return ResponseEntity.ok("Indexing Job Started");
+        } catch (JobExecutionAlreadyRunningException | JobParametersInvalidException | JobRestartException |
+                 JobInstanceAlreadyCompleteException e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
-}
+
+
+
