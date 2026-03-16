@@ -31,9 +31,17 @@ function App() {
     return (
         <div className="min-h-screen bg-white">
             <div className={`flex flex-col items-center ${hasSearched ? 'pt-8' : 'justify-center min-h-screen'}`}>
-                <h1 className={`font-bold text-blue-600 transition-all ${hasSearched ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}>
+                <button
+                    onClick={() => {
+                        setHasSearched(false)
+                        setResults([])
+                        setQuery("")
+                        setCurrentPage(0)
+                        setTotalResults(0)
+                    }}
+                    className={`font-bold text-blue-600 cursor-pointer transition-all ${hasSearched ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}>
                     Proto Search
-                </h1>
+                </button>
                 <SearchBar
                     query={query}
                     setQuery={setQuery}
