@@ -21,7 +21,7 @@ function SearchBar({ query, setQuery, onSearch }) {
             }
             else {
                 setSuggestions([])
-                onSearch(query)
+                onSearch(query, 0)
             }
         } else if (e.key === "ArrowDown"){
             if(selectedIndex < suggestions.length - 1){
