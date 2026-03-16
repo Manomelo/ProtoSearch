@@ -1,9 +1,10 @@
-# Search Engine
+# Proto Search
 
-Motor de busca construído com Spring Boot que rastreia páginas web, indexa seu conteúdo com TF-IDF e expõe uma API REST para consultas.
+Motor de busca construído com Spring Boot que rastreia páginas web, indexa seu conteúdo com TF-IDF e expõe uma API REST para consultas. Conta com um frontend em React para realizar buscas diretamente pelo navegador.
 
 ## Tecnologias
 
+### Backend
 - **Java 21** + **Spring Boot 3.2**
 - **Spring Batch** — pipeline de indexação em chunks
 - **Spring Data JPA** + **PostgreSQL** — persistência de páginas e índice invertido
@@ -11,12 +12,17 @@ Motor de busca construído com Spring Boot que rastreia páginas web, indexa seu
 - **Jsoup** — parsing de HTML e extração de links
 - **Lombok** — redução de boilerplate
 
+### Frontend
+- **React 19** + **Vite** — interface de busca
+- **Tailwind CSS 4** — estilização
+
 ---
 
 ## Pré-requisitos
 
 - Java 21+
 - Maven 3.8+
+- Node.js 18+ (para o frontend em desenvolvimento)
 - PostgreSQL rodando em `localhost:5432`
 - Redis rodando em `localhost:6379`
 
@@ -61,6 +67,8 @@ search.results-per-page=10
 
 ## Executando
 
+### Backend
+
 ```bash
 # Compilar e rodar
 ./mvnw spring-boot:run
@@ -70,11 +78,75 @@ search.results-per-page=10
 java -jar target/ProtoSearch-0.0.1-SNAPSHOT.jar
 ```
 
-A aplicação sobe em `http://localhost:8080`.
+O backend sobe em `http://localhost:8080`.
+
+O frontend já vem embutido no JAR (build estático servido pelo Spring Boot). Para acessar, basta abrir `http://localhost:8080` no navegador.
+
+### Frontend (desenvolvimento)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+O servidor de desenvolvimento sobe em `http://localhost:5173` com proxy para o backend em `localhost:8080`.
+
+Para gerar o build de produção (copiado automaticamente para `src/main/resources/static`):
+
+```bash
+cd frontend
+npm run build
+```
+
+---
+
+## Frontend
+
+Interface web disponível em `http://localhost:8080` com as seguintes funcionalidades:
+
+- **Barra de busca** com sugestões automáticas conforme o usuário digita
+- **Navegação por teclado** nas sugestões: `↑` / `↓` para mover, `Enter` para abrir, `Esc` para fechar
+- **Paginação** dos resultados de busca
+- **Voltar à página inicial** clicando no título "Proto Search"
 
 ---
 
 ## API
+
+### Busca
+
+#### `GET /search`
+
+Realiza uma busca e retorna resultados paginados com ranqueamento TF-IDF.
+
+| Parâmetro | Tipo | Descrição | Padrão |
+|---|---|---|---|
+| `q` | string | Termo de busca | — |
+| `page` | int | Número da página (base 0) | `0` |
+
+```bash
+curl "http://localhost:8080/search?q=java&page=0"
+```
+
+**Resposta:**
+
+```json
+{
+  "results": [
+    {
+      "url": "https://...",
+      "title": "...",
+      "snippet": "..."
+    }
+  ],
+  "page": 0,
+  "pageSize": 10,
+  "totalResults": 42
+}
+```
+
+---
 
 ### Endpoints administrativos
 
@@ -215,4 +287,13 @@ src/main/java/projeto/ProtoSearch/searchengine/
 │   ├── QueryParser.java            # Normalização da query do usuário
 │   └── SnippetExtractor.java       # Extração de trechos relevantes do conteúdo
 └── SearchEngineApplication.java    # Ponto de entrada
+```
+
+```
+frontend/src/
+├── components/
+│   └── Search/
+│       └── SearchBar.jsx           # Barra de busca com sugestões e navegação por teclado
+├── App.jsx                         # Componente principal: busca, resultados e paginação
+└── main.jsx                        # Ponto de entrada React
 ```
