@@ -7,6 +7,7 @@ import com.protosearch.protosearch.repositories.IndexEntryRepository;
 import com.protosearch.protosearch.repositories.PageRepository;
 import com.protosearch.protosearch.services.CrawlerService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -17,9 +18,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
+@Slf4j
 public class AdminController {
 
     private final JobLauncher jobLauncher;
@@ -33,8 +37,18 @@ public class AdminController {
 
     @PostMapping("/crawl")
     public ResponseEntity<String> startCrawl() {
-        crawlerService.startCrawl(crawlerProprieties.getSeedUrls());
-        return ResponseEntity.ok("Crawl started in background.");
+        try{
+            List<String> seeds = crawlerProprieties.getSeedUrls();
+            log.info("Start crawl with seeds: {}", seeds);
+            if(seeds == null || seeds.isEmpty()){
+                return ResponseEntity.badRequest().body("No seed Urls configured!");
+            }
+            crawlerService.startCrawl(seeds);
+            return ResponseEntity.ok("Crawl started with seeds: " + seeds);
+        } catch (Exception e){
+            log.error("Failed to start crawl: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
     }
 
 
